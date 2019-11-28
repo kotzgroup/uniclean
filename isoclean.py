@@ -22,8 +22,12 @@
 # 2019 David Kotz kotz@dartmouth.edu
 # 
 
-# we need arguments, stderr
 import sys
+
+usage = "usage: isoclean.py [--xml|--latex] file..."
+
+if not sys.argv[1:]:
+    exit(usage)
 
 ############# process arguments #####
 
@@ -77,8 +81,7 @@ mapTable = str.maketrans(map)
 # and verify that there are some filenames provided
 if not fileList:
     print("No input files specified.")
-    print("usage: isoclean.py [--xml|--latex] file...")
-    exit
+    sys.exit(usage)
 
 ############# process files #########
 
