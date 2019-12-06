@@ -14,8 +14,10 @@ usage = "usage: isoclean.py [--xml|--latex] [file]..."
 # Then add a new entry to the mapping tables here, to help others in future!
 #
 # If no files are listed, the stdin is transformed and printed to stdout.
-# Otherwise, each file is transformed and written back to the same file; if no changes
-# were needed, the file is not touched.
+# Otherwise, each file is transformed and written back to the same file; 
+# if no changes were needed, the file is not touched.
+#
+# Exit 0 if success, non-zero if any Unicode could not be translated.
 #
 # References:
 #  https://docs.python.org/3/howto/unicode.html
@@ -29,6 +31,9 @@ usage = "usage: isoclean.py [--xml|--latex] [file]..."
 # 
 
 import sys
+
+# number of instances where we could not translate a Unicode
+failureCount = 0
 
 ############# main: process arguments #####
 
@@ -83,9 +88,13 @@ mapTable = str.maketrans(map)
 # arguments:
 #   sInput is a str that may contain Unicode
 #   source is a str that describes the source of sInput ("stdin" or a filename)
-# return value is a str with all Unicode mapped according to mapTable and mapErrors
+# return value: a str with Unicode mapped according to mapTable and mapErrors.
+# global variable 'failureCount' is incremented for each translation failure.
 
 def transform(sInput, source):
+    # track the number of translation failures, over time
+    global failureCount
+
     # map characters to ASCII equivalent, according to above mappings
     sText = sInput.translate(mapTable)
 
@@ -101,6 +110,7 @@ def transform(sInput, source):
         e = sText.find('}', s)
         print(source+": unknown Unicode", sText[s:e+1], file=sys.stderr)
         s = e
+        failureCount += 1
 
     return sText
 
@@ -128,3 +138,6 @@ else:
             if sText != sInput:
                 with open(filename, 'wt') as fOutput:
                     fOutput.write(sText)
+
+# exit 0=success, non-zero = number of translation failures
+exit(failureCount)
