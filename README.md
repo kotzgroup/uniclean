@@ -5,19 +5,17 @@ Each file is ***OVERWRITTEN*** with the updated text, unless no changes are need
 If no files are listed, stdin is processed to stdout.
 Untranslated codes are reported as warnings to stderr.
 
-usage:
 
-```
-   isoclean.py [--xml|--latex] [file]...
-```
-
+	usage: isoclean.py [-h] [--ascii | --xml | --html | --latex]
+                   [filename [filename ...]]
 where
 
+ * default  `--ascii` will translate to plain text (ASCII) equivalents;
  * optional `--xml`   will translate to XML (HTML) equivalents;
+ * optional `--html`  will translate to HTML (XML) equivalents;
  * optional `--latex` will translate to LaTeX equivalents;
- * default is plain-text ASCII equivalents.
 
-The latter two cases may leave some characters unmapped, and warn to stderr;
+The ASCII and LaTeX cases may leave some characters unmapped, and warn to stderr;
 if such warnings occur, search the output for `\N{..}` and fix it by hand.
 Then add a new entry to the mapping tables here, to help others in future!
 
