@@ -52,9 +52,11 @@ def initASCII():
            "…":"...",
            "á":"a", "à":"a", "ä":"a",
            "é":"e", "è":"e",
+           "í":"i",
            "ö":"o",
-           "ü":"u",
+           "ü":"u", "ú":"u",
            "ñ":"n",
+           "ž":"z",
            "•":"*"
            }
     # build a translation table from that map
@@ -81,9 +83,11 @@ def initLaTeX():
            "…":"{\\ldots}",
            "á":"\\'{a}", "à":"\\`{a}", "ä":'\\"{a}',
            "é":"\\'{e}", "è":"\\`{e}",
+           "í":"\\\'{\i}",
            "ö":'\\"{o}',
-           "ü":'\\"{u}',
+           "ü":'\\"{u}', "ú":"\\'{u}",
            "ñ":"\\~{n}",
+           "ž":"\\v{z}",   # might not work in all fonts
            "•":"$\\bullet$"
            }
     # build a translation table from that map
