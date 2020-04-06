@@ -57,7 +57,8 @@ def initASCII():
            "ü":"u", "ú":"u",
            "ñ":"n",
            "ž":"z",
-           "•":"*"
+           "•":"*",
+           "\u00A0":" "
            }
     # build a translation table from that map
     mapTable = str.maketrans(map)
@@ -88,7 +89,8 @@ def initLaTeX():
            "ü":'\\"{u}', "ú":"\\'{u}",
            "ñ":"\\~{n}",
            "ž":"\\v{z}",   # might not work in all fonts
-           "•":"$\\bullet$"
+           "•":"$\\bullet$",
+           "\u00A0":"~"
            }
     # build a translation table from that map
     mapTable = str.maketrans(map)
