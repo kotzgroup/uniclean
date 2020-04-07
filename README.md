@@ -1,4 +1,4 @@
-# isoclean
+# uniclean
 
 Translate input from Unicode (UTF-8) to LaTeX or ASCII equivalents.
 Each file is ***OVERWRITTEN*** with the updated text, unless no changes are needed.
@@ -6,7 +6,7 @@ If no files are listed, stdin is processed to stdout.
 Untranslated codes are reported as warnings to stderr.
 
 
-	usage: isoclean.py [-h] [--ascii | --xml | --html | --latex]
+	usage: uniclean.py [-h] [--ascii | --xml | --html | --latex]
                    [filename [filename ...]]
 where
 

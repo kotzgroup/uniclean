@@ -4,7 +4,7 @@
 # If no files are listed, stdin is processed to stdout.
 # Untranslated codes are reported as warnings to stderr.
 #
-# isoclean.py [--ascii | --xml | --html | --latex]  [filename]...
+# uniclean.py [--ascii | --xml | --html | --latex]  [filename]...
 #
 # where
 #  default  --ascii will translate to plain-text ASCII equivalents;
