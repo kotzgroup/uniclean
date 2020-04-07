@@ -36,8 +36,8 @@
 import sys
 import argparse
 
+##############################################################################
 ########### init functions to set mapTable and mapErrors ###################
-
 def initASCII():
     # plaintext mappings
     global mapTable
@@ -95,17 +95,19 @@ def initLaTeX():
     # build a translation table from that map
     mapTable = str.maketrans(map)
 
+##############################################################################
 ########### transform: function to transform Unicode from sInput #############
 # arguments:
 #   sInput is a str that may contain Unicode
 #   source is a str that describes the source of sInput ("stdin" or a filename)
-# return value: a str with Unicode mapped according to mapTable and mapErrors.
-# global variable 'failureCount' is incremented for each translation failure.
+# returns (sText, nErrors):
+# where sText is a str with Unicode mapped according to mapTable and mapErrors,
+#  and  nErrors is a count of translation failures.
 
 def transform(sInput, source):
     # track the number of translation failures, over time
-    global failureCount
     global mapTable, mapErrors
+    nErrors = 0
 
     # map characters to ASCII equivalent, according to above mappings
     sText = sInput.translate(mapTable)
@@ -122,51 +124,65 @@ def transform(sInput, source):
         e = sText.find('}', s)
         print(source+": unknown Unicode", sText[s:e+1], file=sys.stderr)
         s = e
-        failureCount += 1
+        nErrors += 1
 
-    return sText
+    return (sText, nErrors)
 
 
-############# main: process arguments, initialize, execute #####
+##############################################################################
+############ main: process arguments, initialize, execute
+def main():
+    # parse command-line arguments
+    parser = argparse.ArgumentParser(description='''
+        Translate Unicode within files, to ASCII, XML, HTML, or LaTeX.
+        Each file is processed and overwritten with any changes needed.
+        If no files are listed, stdin is processed to stdout.''')
+    formatGroup = parser.add_mutually_exclusive_group()
+    formatGroup.add_argument('--ascii', action='store_const', \
+                                 dest='init', const=initASCII)
+    formatGroup.add_argument('--xml',   action='store_const', \
+                                 dest='init', const=initXML)
+    formatGroup.add_argument('--html',  action='store_const', \
+                                 dest='init', const=initXML)
+    formatGroup.add_argument('--latex', action='store_const', \
+                                 dest='init', const=initLaTeX)
+    parser.add_argument('filename', type=str, nargs='*', \
+                            help="file to be updated")
+    parser.set_defaults(init=initASCII)
+    args = parser.parse_args()
+    args.init() # initialize mapTable and mapErrors
 
-# parse command-line arguments
-parser = argparse.ArgumentParser(description='''
-    Translate Unicode within files, to ASCII, XML, HTML, or LaTeX.
-    Each file is processed and overwritten with any changes needed.
-    If no files are listed, stdin is processed to stdout.''')
-formatGroup = parser.add_mutually_exclusive_group()
-formatGroup.add_argument('--ascii', action='store_const', dest='init', const=initASCII)
-formatGroup.add_argument('--xml',   action='store_const', dest='init', const=initXML)
-formatGroup.add_argument('--html',  action='store_const', dest='init', const=initXML)
-formatGroup.add_argument('--latex', action='store_const', dest='init', const=initLaTeX)
-parser.add_argument('filename', type=str, nargs='*', help="file to be updated")
-parser.set_defaults(init=initASCII)
-args = parser.parse_args()
-args.init() # initialize mapTable and mapErrors
+    # number of instances where we could not translate a Unicode
+    failureCount = 0
 
-# number of instances where we could not translate a Unicode
-failureCount = 0
+    # Behavior depends on whether arguments include filenames
+    if not args.filename:
+        # no files listed - process stdin
+        # assume UTF-8; don't translate line-endings
+        sys.stdin.reconfigure(encoding='UTF-8', newline='')
+        sInput = sys.stdin.read()
+        sText = transform(sInput, "stdin")
+        sys.stdout.write(sText)
+    else:
+        # one or more files listed - process each in turn
+        for filename in args.filename:
+            # open the file in 'text' mode
+            # assume UTF-8; don't translate line-endings
+            with open(filename, mode='rt', encoding='UTF-8', newline='') as f:
+                # read all its text as a Unicode string
+                sInput = f.read()
+                # transform its Unicode characters
+                (sText, nErrors) = transform(sInput, filename)
+                failureCount += nErrors
+                # overwrite the original file with the updated string
+                if sText != sInput:  # but only if different
+                    with open(filename, 'wt') as fOutput:
+                        fOutput.write(sText)
 
-# Behavior depends on whether arguments include filenames
-if not args.filename:
-    # no files listed - process stdin; assume UTF-8; don't translate line-endings
-    sys.stdin.reconfigure(encoding='utf-8', newline='')
-    sInput = sys.stdin.read()
-    sText = transform(sInput, "stdin")
-    sys.stdout.write(sText)
-else:
-    # one or more files listed - process each in turn
-    for filename in args.filename:
-        # open the file in 'text' mode; assume UTF-8; don't translate line-endings
-        with open(filename, mode='rt', encoding='UTF-8', newline='') as fInput:
-            # read all its text as a Unicode string
-            sInput = fInput.read()
-            # transform its Unicode characters
-            sText = transform(sInput, filename)
-            # overwrite the original file with the updated string, if different
-            if sText != sInput:
-                with open(filename, 'wt') as fOutput:
-                    fOutput.write(sText)
+####################################################
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
 
-# exit 0=success, non-zero = number of translation failures
-exit(failureCount)
+    # exit 0=success, non-zero = number of translation failures
+    exit(failureCount)
