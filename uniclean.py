@@ -30,18 +30,18 @@
 #  https://docs.python.org/3/library/stdtypes.html#bytes.decode
 #  https://stackoverflow.com/questions/16549332/python-3-how-to-specify-stdin-encoding
 #
-# 2019 David Kotz kotz@dartmouth.edu
+# 2019-20 David Kotz kotz@dartmouth.edu
 #
 
 import sys
 import argparse
 
 ##############################################################################
-########### init functions to set mapTable and mapErrors ###################
-def initASCII():
+########### functions to return mapTable and mapErrors ###################
+
+# return ASCII mappings
+def mapASCII(): # return (mapTable, mapErrors)
     # plaintext mappings
-    global mapTable
-    global mapErrors
     mapErrors = 'namereplace'  # unmapped codes will output names '\N{...}'
     map = {"«":"<<", "»":">>", 
            "‘":"'", "’":"'", 
@@ -62,18 +62,20 @@ def initASCII():
            }
     # build a translation table from that map
     mapTable = str.maketrans(map)
+    return (mapTable, mapErrors)
 
-def initXML():
-    # XML mappings (also useful for HTML)
-    global mapTable, mapErrors
+##############################################################################
+# return XML mappings (also useful for HTML)
+def mapXML(): # return (mapTable, mapErrors)
     mapErrors = 'xmlcharrefreplace'
     map = { } # we need no map: all non-ASCII will be mapped to '&#xxx;'
     # build a translation table from that map
     mapTable = str.maketrans(map)
+    return (mapTable, mapErrors)
         
-def initLaTeX():
-    # latex mappings
-    global mapTable, mapErrors
+##############################################################################
+# return LaTeX mappings
+def mapLaTeX(): # return (mapTable, mapErrors)
     mapErrors = 'namereplace'  # unmapped codes will output names '\N{...}'
     map = {"«":"{\\guillemotleft}", "»":"{\\guillemotright}",
            "‘":"`", "’":"'", 
@@ -94,19 +96,25 @@ def initLaTeX():
            }
     # build a translation table from that map
     mapTable = str.maketrans(map)
+    return (mapTable, mapErrors)
 
 ##############################################################################
 ########### transform: function to transform Unicode from sInput #############
 # arguments:
 #   sInput is a str that may contain Unicode
 #   source is a str that describes the source of sInput ("stdin" or a filename)
+#   maps   is a tuple (table, errors) returned by one of the above functions.
 # returns (sText, nErrors):
 # where sText is a str with Unicode mapped according to mapTable and mapErrors,
 #  and  nErrors is a count of translation failures.
+#
+# typical usage:
+#   (sText, nErrors) = uniclean.transform(sInput, source, uniclean.mapLaTeX())
+#
+def transform(sInput, source, maps):
+    (mapTable, mapErrors) = maps
 
-def transform(sInput, source):
     # track the number of translation failures, over time
-    global mapTable, mapErrors
     nErrors = 0
 
     # map characters to ASCII equivalent, according to above mappings
@@ -139,18 +147,18 @@ def main():
         If no files are listed, stdin is processed to stdout.''')
     formatGroup = parser.add_mutually_exclusive_group()
     formatGroup.add_argument('--ascii', action='store_const', \
-                                 dest='init', const=initASCII)
+                                 dest='init', const=mapASCII)
     formatGroup.add_argument('--xml',   action='store_const', \
-                                 dest='init', const=initXML)
+                                 dest='init', const=mapXML)
     formatGroup.add_argument('--html',  action='store_const', \
-                                 dest='init', const=initXML)
+                                 dest='init', const=mapXML)
     formatGroup.add_argument('--latex', action='store_const', \
-                                 dest='init', const=initLaTeX)
+                                 dest='init', const=mapLaTeX)
     parser.add_argument('filename', type=str, nargs='*', \
                             help="file to be updated")
-    parser.set_defaults(init=initASCII)
+    parser.set_defaults(init=mapASCII)
     args = parser.parse_args()
-    args.init() # initialize mapTable and mapErrors
+    maps = args.init() # initialize mapping table needed by transform()
 
     # number of instances where we could not translate a Unicode
     failureCount = 0
@@ -161,7 +169,7 @@ def main():
         # assume UTF-8; don't translate line-endings
         sys.stdin.reconfigure(encoding='UTF-8', newline='')
         sInput = sys.stdin.read()
-        sText = transform(sInput, "stdin")
+        sText = transform(sInput, "stdin", maps)
         sys.stdout.write(sText)
     else:
         # one or more files listed - process each in turn
@@ -172,7 +180,7 @@ def main():
                 # read all its text as a Unicode string
                 sInput = f.read()
                 # transform its Unicode characters
-                (sText, nErrors) = transform(sInput, filename)
+                (sText, nErrors) = transform(sInput, filename, maps)
                 failureCount += nErrors
                 # overwrite the original file with the updated string
                 if sText != sInput:  # but only if different
