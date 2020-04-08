@@ -39,10 +39,11 @@ import argparse
 ##############################################################################
 ########### functions to return mapTable and mapErrors ###################
 
-# return ASCII mappings
-def mapASCII(): # return (mapTable, mapErrors)
+##############################################################################
+# Return ASCII mappings; caller can optionally provide an additional map,
+# which updates (or replaces) entries in the default map.
+def mapASCII(mapp={}): # return (mapTable, mapErrors)
     # plaintext mappings
-    mapErrors = 'namereplace'  # unmapped codes will output names '\N{...}'
     map = {
         "«":"<<", "»":">>",
         "‘":"'", "’":"'",
@@ -63,39 +64,36 @@ def mapASCII(): # return (mapTable, mapErrors)
         "•":"*",
         "\u00A0":" ",  # non-breaking space
         "\u2029":"\n", # paragraph break
-        # special mappings Dave uses to indicate paragraph breaks:
-        "¶"     :"\n", # paragraph break (used in vita bibtex)
-        "⁋"     :"\n", # paragraph break (used in vita bibtex)
-        # special mappings Dave uses to indicate emphasis:
-        "⦉"     :r"",  # begin emphasis (used in vita bibtex)
-        "⦊"     :r""   # end emphasis (used in vita bibtex)
         }
+    # update the default map with additions (or replacements) from parameter
+    map.update(mapp)
+
+    # unmapped codes will output names '\N{...}'
+    mapErrors = 'namereplace'
+
     # build a translation table from that map
     mapTable = str.maketrans(map)
     return (mapTable, mapErrors)
 
 ##############################################################################
-# return XML mappings (also useful for HTML)
-def mapXML(): # return (mapTable, mapErrors)
+# Return XML mappings (also useful for HTML); caller can optionally provide an additional map,
+# which updates (or replaces) entries in the default map.
+def mapXML(map={}): # return (mapTable, mapErrors)
+    # the default parameter (empty map) is sufficient.
+
+    # any unmapped non-ASCII chars will be mapped to '&#xxx;'
     mapErrors = 'xmlcharrefreplace'
-    map = { # we need almost no map: all non-ASCII will be mapped to '&#xxx;'
-        # the exception are these special mappings Dave uses to indicate paragraph breaks:
-        "¶"     :"</p><p>", # paragraph break (used in vita bibtex)
-        "⁋"     :"</p><p>", # paragraph break (used in vita bibtex)
-        # and special mappings Dave uses to indicate emphasis:
-        "⦉"     :r"<em>", # begin emphasis (used in vita bibtex)
-        "⦊"     :r"</em>" # end emphasis (used in vita bibtex)
-        }
+
     # build a translation table from that map
     mapTable = str.maketrans(map)
     return (mapTable, mapErrors)
 
 ##############################################################################
-# return LaTeX mappings for unicode
-# as well as non-unicode 'special chars' that can't be used in text mode:
+# Return LaTeX mappings; caller can optionally provide an additional map,
+# which updates (or replaces) entries in the default map.
+# Our map also maps non-unicode 'special chars' that cause LaTeX trouble in text mode:
 #     # $ % & ~ _ ^ \ { } < = >
-def mapLaTeX(): # return (mapTable, mapErrors)
-    mapErrors = 'namereplace'  # unmapped codes will output names '\N{...}'
+def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
     map = {
         "#":r"\#", "$":r"\$", "%":r"\%", "&":r"\&", "{":r"\{", "}":r"\}",
         "~":r"{\textasciitilde}", "^": r"{\textasciicircum}",
@@ -120,13 +118,13 @@ def mapLaTeX(): # return (mapTable, mapErrors)
         "•":r"$\bullet$",
         "\u00A0":r"~",      # non-breaking space
         "\u2029":r"\par ",  # paragraph break
-        # special mappings Dave uses to indicate paragraph breaks:
-        "¶"     :r"\par ",  # paragraph break (used in vita bibtex)
-        "⁋"     :r"\par ",  # paragraph break (used in vita bibtex)
-        # special mappings Dave uses to indicate emphasis:
-        "⦉"     :r"\emph{", # begin emphasis (used in vita bibtex)
-        "⦊"     :r"}"       # end emphasis (used in vita bibtex)
         }
+    # update the default map with additions (or replacements) from parameter
+    map.update(mapp)
+
+    # unmapped codes will output names '\N{...}'
+    mapErrors = 'namereplace'
+
     # build a translation table from that map
     mapTable = str.maketrans(map)
     return (mapTable, mapErrors)
