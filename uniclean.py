@@ -43,23 +43,31 @@ import argparse
 def mapASCII(): # return (mapTable, mapErrors)
     # plaintext mappings
     mapErrors = 'namereplace'  # unmapped codes will output names '\N{...}'
-    map = {"«":"<<", "»":">>", 
-           "‘":"'", "’":"'", 
-           '“':'"', '”':'"', 
-           "—":"-", "–":"-",
-           "≤":"<=", "≥":">=",
-           "©":"(c)",
-           "…":"...",
-           "á":"a", "à":"a", "ä":"a",
-           "é":"e", "è":"e",
-           "í":"i",
-           "ö":"o",
-           "ü":"u", "ú":"u",
-           "ñ":"n",
-           "ž":"z",
-           "•":"*",
-           "\u00A0":" "
-           }
+    map = {
+        "«":"<<", "»":">>", 
+        "‘":"'", "’":"'", 
+        '“':'"', '”':'"', 
+        "—":"-", "–":"-",
+        "≤":"<=", "≥":">=",
+        "©":"(c)",
+        "…":"...",
+        "á":"a", "à":"a", "ä":"a",
+        "é":"e", "è":"e",
+        "í":"i",
+        "ö":"o", "ó":"o",
+        "ü":"u", "ú":"u",
+        "č":"c", "ć":"c", "ç":"c", "Ç":"C",
+        "ñ":"n",
+        "ş":"s",
+        "ž":"z",
+        "•":"*",
+        "\u00A0":" ",  # non-breaking space
+        "\u2029":"\n", # paragraph break
+        "¶"     :"\n", # paragraph break
+        "⁋"     :"\n", # paragraph break
+        "⦉"     :r"",  # begin emphasis (used in vita bibtex)
+        "⦊"     :r""   # end emphasis (used in vita bibtex)
+        }
     # build a translation table from that map
     mapTable = str.maketrans(map)
     return (mapTable, mapErrors)
@@ -74,26 +82,40 @@ def mapXML(): # return (mapTable, mapErrors)
     return (mapTable, mapErrors)
         
 ##############################################################################
-# return LaTeX mappings
+# return LaTeX mappings for unicode
+# as well as non-unicode 'special chars' that can't be used in text mode:
+#     # $ % & ~ _ ^ \ { } < = >
 def mapLaTeX(): # return (mapTable, mapErrors)
     mapErrors = 'namereplace'  # unmapped codes will output names '\N{...}'
-    map = {"«":"{\\guillemotleft}", "»":"{\\guillemotright}",
-           "‘":"`", "’":"'", 
-           '“':"``", '”':"''", 
-           "—":"---", "–":"--",
-           "≤":"$\\leq$", "≥":"$\\geq$",
-           "©":"{\\textcopyright}",
-           "…":"{\\ldots}",
-           "á":"\\'{a}", "à":"\\`{a}", "ä":'\\"{a}',
-           "é":"\\'{e}", "è":"\\`{e}",
-           "í":"\\\'{\i}",
-           "ö":'\\"{o}',
-           "ü":'\\"{u}', "ú":"\\'{u}",
-           "ñ":"\\~{n}",
-           "ž":"\\v{z}",   # might not work in all fonts
-           "•":"$\\bullet$",
-           "\u00A0":"~"
-           }
+    map = {
+        "#":r"\#", "$":r"\$", "%":r"\%", "&":r"\&", "{":r"\{", "}":r"\}",
+        "~":r"{\textasciitilde}", "^": r"{\textasciicircum}",
+        "_":r"{\textunderscore}", "\\":r"{\textbackslash}",
+        "<":r"{$<$}", "=": r"{$=$}", ">": r"{$>$}",
+        "«":r"{\guillemotleft}",  "»": r"{\guillemotright}",
+        "‘":r"`",   "’":r"'",
+        '“':r"``",  '”':r"''",
+        "—":r"---", "–":r"--",
+        "≤":r"$\leq$", "≥":r"$\geq$",
+        "©":r"{\textcopyright}",
+        "…":r"{\ldots}",
+        "á":r"{\'{a}}", "à":r"{\`{a}}", "ä":r'{\"{a}}',
+        "é":r"{\'{e}}", "è":r"{\`{e}}",
+        "í":r"{\'{\i}}",
+        "ö":r'{\"{o}}', "ó":r'{\"{o}}',
+        "ü":r'{\"{u}}', "ú":r"{\'{u}}",
+        "č":r"{\v{c}}", "ć":r"{\'c}",   "ç":r"{\c{c}}", "Ç":r"{\c{C}}",
+        "ñ":r"{\~{n}}",
+        "ş":r"{\c{s}}",
+        "ž":r"{\v{z}}",   # might not work in all fonts
+        "•":r"$\bullet$",
+        "\u00A0":r"~",      # non-breaking space
+        "\u2029":r"\par ",  # paragraph break
+        "¶"     :r"\par ",  # paragraph break
+        "⁋"     :r"\par ",  # paragraph break
+        "⦉"     :r"\emph{", # begin emphasis (used in vita bibtex)
+        "⦊"     :r"}"       # end emphasis (used in vita bibtex)
+        }
     # build a translation table from that map
     mapTable = str.maketrans(map)
     return (mapTable, mapErrors)
@@ -127,8 +149,8 @@ def transform(sInput, source, maps):
 
     # warn about unreplaced Unicode characters
     s = 0 # index to start looking within sText
-    while '\\N{' in sText[s:]:
-        s = sText.find('\\N{', s)
+    while r'\N{' in sText[s:]:
+        s = sText.find(r'\N{', s)
         e = sText.find('}', s)
         print(source+": unknown Unicode", sText[s:e+1], file=sys.stderr)
         s = e
@@ -169,7 +191,8 @@ def main():
         # assume UTF-8; don't translate line-endings
         sys.stdin.reconfigure(encoding='UTF-8', newline='')
         sInput = sys.stdin.read()
-        sText = transform(sInput, "stdin", maps)
+        (sText, nErrors) = transform(sInput, "stdin", maps)
+        failureCount += nErrors
         sys.stdout.write(sText)
     else:
         # one or more files listed - process each in turn
@@ -187,10 +210,10 @@ def main():
                     with open(filename, 'wt') as fOutput:
                         fOutput.write(sText)
 
+    # exit 0=success, non-zero = number of translation failures
+    sys.exit(failureCount)
+
 ####################################################
 if __name__ == "__main__":
     # execute only if run as a script
     main()
-
-    # exit 0=success, non-zero = number of translation failures
-    exit(failureCount)
