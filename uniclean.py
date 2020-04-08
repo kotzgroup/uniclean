@@ -16,7 +16,7 @@
 # Then add a new entry to the mapping tables here, to help others in future!
 #
 # If no files are listed, the stdin is transformed and printed to stdout.
-# Otherwise, each file is transformed and written back to the SAME file; 
+# Otherwise, each file is transformed and written back to the SAME file;
 # if no changes were needed, the file is not touched.
 #
 # Exit 0 if success, non-zero if any Unicode could not be translated.
@@ -44,9 +44,9 @@ def mapASCII(): # return (mapTable, mapErrors)
     # plaintext mappings
     mapErrors = 'namereplace'  # unmapped codes will output names '\N{...}'
     map = {
-        "«":"<<", "»":">>", 
-        "‘":"'", "’":"'", 
-        '“':'"', '”':'"', 
+        "«":"<<", "»":">>",
+        "‘":"'", "’":"'",
+        '“':'"', '”':'"',
         "—":"-", "–":"-",
         "≤":"<=", "≥":">=",
         "©":"(c)",
@@ -80,7 +80,7 @@ def mapXML(): # return (mapTable, mapErrors)
     # build a translation table from that map
     mapTable = str.maketrans(map)
     return (mapTable, mapErrors)
-        
+
 ##############################################################################
 # return LaTeX mappings for unicode
 # as well as non-unicode 'special chars' that can't be used in text mode:
