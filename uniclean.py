@@ -63,8 +63,10 @@ def mapASCII(): # return (mapTable, mapErrors)
         "•":"*",
         "\u00A0":" ",  # non-breaking space
         "\u2029":"\n", # paragraph break
-        "¶"     :"\n", # paragraph break
-        "⁋"     :"\n", # paragraph break
+        # special mappings Dave uses to indicate paragraph breaks:
+        "¶"     :"\n", # paragraph break (used in vita bibtex)
+        "⁋"     :"\n", # paragraph break (used in vita bibtex)
+        # special mappings Dave uses to indicate emphasis:
         "⦉"     :r"",  # begin emphasis (used in vita bibtex)
         "⦊"     :r""   # end emphasis (used in vita bibtex)
         }
@@ -76,7 +78,14 @@ def mapASCII(): # return (mapTable, mapErrors)
 # return XML mappings (also useful for HTML)
 def mapXML(): # return (mapTable, mapErrors)
     mapErrors = 'xmlcharrefreplace'
-    map = { } # we need no map: all non-ASCII will be mapped to '&#xxx;'
+    map = { # we need almost no map: all non-ASCII will be mapped to '&#xxx;'
+        # the exception are these special mappings Dave uses to indicate paragraph breaks:
+        "¶"     :"</p><p>", # paragraph break (used in vita bibtex)
+        "⁋"     :"</p><p>", # paragraph break (used in vita bibtex)
+        # and special mappings Dave uses to indicate emphasis:
+        "⦉"     :r"<em>", # begin emphasis (used in vita bibtex)
+        "⦊"     :r"</em>" # end emphasis (used in vita bibtex)
+        }
     # build a translation table from that map
     mapTable = str.maketrans(map)
     return (mapTable, mapErrors)
@@ -111,8 +120,10 @@ def mapLaTeX(): # return (mapTable, mapErrors)
         "•":r"$\bullet$",
         "\u00A0":r"~",      # non-breaking space
         "\u2029":r"\par ",  # paragraph break
-        "¶"     :r"\par ",  # paragraph break
-        "⁋"     :r"\par ",  # paragraph break
+        # special mappings Dave uses to indicate paragraph breaks:
+        "¶"     :r"\par ",  # paragraph break (used in vita bibtex)
+        "⁋"     :r"\par ",  # paragraph break (used in vita bibtex)
+        # special mappings Dave uses to indicate emphasis:
         "⦉"     :r"\emph{", # begin emphasis (used in vita bibtex)
         "⦊"     :r"}"       # end emphasis (used in vita bibtex)
         }
@@ -126,20 +137,15 @@ def mapLaTeX(): # return (mapTable, mapErrors)
 #   sInput is a str that may contain Unicode
 #   source is a str that describes the source of sInput ("stdin" or a filename)
 #   maps   is a tuple (table, errors) returned by one of the above functions.
-# returns (sText, nErrors):
-# where sText is a str with Unicode mapped according to mapTable and mapErrors,
-#  and  nErrors is a count of translation failures.
+# returns sText, a str with Unicode mapped according to mapTable and mapErrors.
+# Any unmapped characters are handled according to second element of 'maps'.
 #
 # typical usage:
-#   (sText, nErrors) = uniclean.transform(sInput, source, uniclean.mapLaTeX())
+#   sText = uniclean.transform(sInput, source, uniclean.mapLaTeX())
 #
 def transform(sInput, source, maps):
-    (mapTable, mapErrors) = maps
-
-    # track the number of translation failures, over time
-    nErrors = 0
-
     # map characters to ASCII equivalent, according to above mappings
+    (mapTable, mapErrors) = maps
     sText = sInput.translate(mapTable)
 
     # convert to ASCII byte-string; handle remaining unmapped chars here
@@ -147,16 +153,26 @@ def transform(sInput, source, maps):
     # convert that 'bytes' object back to a 'str' object
     sText = bText.decode('ascii')
 
-    # warn about unreplaced Unicode characters
-    s = 0 # index to start looking within sText
+    return sText
+
+##############################################################################
+########### countUnmapped: count number of unmapped chars left in sText ######
+# warn about unreplaced Unicode characters
+# arguments:
+#   sText is a str that resulted from transform()
+#   warn (optional) is an open File; if present, errors are printed to that file
+def countUnmapped(sText, warnFile=None):
+    nErrors = 0 # number of errors found
+    s = 0       # index to start looking within sText
     while r'\N{' in sText[s:]:
         s = sText.find(r'\N{', s)
         e = sText.find('}', s)
-        print(source+": unknown Unicode", sText[s:e+1], file=sys.stderr)
+        if warnFile:
+            print(source+": unknown Unicode", sText[s:e+1], file=warnFile)
         s = e
         nErrors += 1
 
-    return (sText, nErrors)
+    return nErrors
 
 
 ##############################################################################
@@ -191,8 +207,8 @@ def main():
         # assume UTF-8; don't translate line-endings
         sys.stdin.reconfigure(encoding='UTF-8', newline='')
         sInput = sys.stdin.read()
-        (sText, nErrors) = transform(sInput, "stdin", maps)
-        failureCount += nErrors
+        sText = transform(sInput, "stdin", maps)
+        failureCount += countUnmapped(sText, sys.stderr)
         sys.stdout.write(sText)
     else:
         # one or more files listed - process each in turn
@@ -203,8 +219,8 @@ def main():
                 # read all its text as a Unicode string
                 sInput = f.read()
                 # transform its Unicode characters
-                (sText, nErrors) = transform(sInput, filename, maps)
-                failureCount += nErrors
+                sText = transform(sInput, filename, maps)
+                failureCount += countUnmapped(sText, sys.stderr)
                 # overwrite the original file with the updated string
                 if sText != sInput:  # but only if different
                     with open(filename, 'wt') as fOutput:
