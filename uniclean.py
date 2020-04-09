@@ -133,15 +133,14 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
 ########### transform: function to transform Unicode from sInput #############
 # arguments:
 #   sInput is a str that may contain Unicode
-#   source is a str that describes the source of sInput ("stdin" or a filename)
 #   maps   is a tuple (table, errors) returned by one of the above functions.
 # returns sText, a str with Unicode mapped according to mapTable and mapErrors.
 # Any unmapped characters are handled according to second element of 'maps'.
 #
 # typical usage:
-#   sText = uniclean.transform(sInput, source, uniclean.mapLaTeX())
+#   sText = uniclean.transform(sInput, uniclean.mapLaTeX())
 #
-def transform(sInput, source, maps):
+def transform(sInput, maps):
     # map characters to ASCII equivalent, according to above mappings
     (mapTable, mapErrors) = maps
     sText = sInput.translate(mapTable)
@@ -158,8 +157,9 @@ def transform(sInput, source, maps):
 # warn about unreplaced Unicode characters
 # arguments:
 #   sText is a str that resulted from transform()
+#   source is a str that describes the source of sInput (e.g., "stdin" or a filename)
 #   warn (optional) is an open File; if present, errors are printed to that file
-def countUnmapped(sText, warnFile=None):
+def countUnmapped(sText, source, warnFile=None):
     nErrors = 0 # number of errors found
     s = 0       # index to start looking within sText
     while r'\N{' in sText[s:]:
@@ -205,8 +205,8 @@ def main():
         # assume UTF-8; don't translate line-endings
         sys.stdin.reconfigure(encoding='UTF-8', newline='')
         sInput = sys.stdin.read()
-        sText = transform(sInput, "stdin", maps)
-        failureCount += countUnmapped(sText, sys.stderr)
+        sText = transform(sInput, maps)
+        failureCount += countUnmapped(sText, "stdin", sys.stderr)
         sys.stdout.write(sText)
     else:
         # one or more files listed - process each in turn
@@ -217,8 +217,8 @@ def main():
                 # read all its text as a Unicode string
                 sInput = f.read()
                 # transform its Unicode characters
-                sText = transform(sInput, filename, maps)
-                failureCount += countUnmapped(sText, sys.stderr)
+                sText = transform(sInput, maps)
+                failureCount += countUnmapped(sText, filename, sys.stderr)
                 # overwrite the original file with the updated string
                 if sText != sInput:  # but only if different
                     with open(filename, 'wt') as fOutput:
