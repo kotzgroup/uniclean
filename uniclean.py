@@ -22,6 +22,7 @@
 # Exit 0 if success, non-zero if any Unicode could not be translated.
 #
 # References:
+#  https://www.compart.com/en/unicode/
 #  https://docs.python.org/2/library/argparse.html#module-argparse
 #  https://docs.python.org/3/howto/unicode.html
 #  https://docs.python.org/3/library/stdtypes.html#str.maketrans
@@ -134,14 +135,14 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
 # arguments:
 #   sInput is a str that may contain Unicode
 #   maps   is a tuple (table, errors) returned by one of the above functions.
-# returns sText, a str with Unicode mapped according to mapTable and mapErrors.
+# returns sText, a str with Unicode mapped according to 'table' and 'errors'.
 # Any unmapped characters are handled according to second element of 'maps'.
 #
 # typical usage:
 #   sText = uniclean.transform(sInput, uniclean.mapLaTeX())
 #
 def transform(sInput, maps):
-    # map characters to ASCII equivalent, according to above mappings
+    # map characters to equivalent, according to above mappings
     (mapTable, mapErrors) = maps
     sText = sInput.translate(mapTable)
 
