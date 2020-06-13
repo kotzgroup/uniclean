@@ -49,7 +49,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "«":"<<", "»":">>",
         "‘":"'", "’":"'",
         '“':'"', '”':'"',
-        "—":"-", "–":"-", "‐":"-",
+        "—":"-", "–":"-", "−":"-", "‐":"-",
         "≤":"<=", "≥":">=",
         "©":"(c)",
         "…":"...",
@@ -63,6 +63,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "ş":"s",
         "ž":"z",
         "•":"*",
+        "ﬁ":"fi",      # ligature
         "\u00A0":" ",  # non-breaking space
         "\u2029":"\n", # paragraph break
         }
@@ -103,7 +104,7 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "«":r"{\guillemotleft}",  "»": r"{\guillemotright}",
         "‘":r"`",   "’":r"'",
         '“':r"``",  '”':r"''",
-        "—":r"---", "–":r"--", "‐":r"-",
+        "—":r"---", "–":r"--", "−":r"--", "‐":r"-",
         "≤":r"$\leq$", "≥":r"$\geq$",
         "©":r"{\textcopyright}",
         "…":r"{\ldots}",
@@ -115,7 +116,8 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "č":r"{\v{c}}", "ć":r"{\'c}",   "ç":r"{\c{c}}", "Ç":r"{\c{C}}",
         "ñ":r"{\~{n}}",
         "ş":r"{\c{s}}",
-        "ž":r"{\v{z}}",   # might not work in all fonts
+        "ž":r"{\v{z}}",     # might not work in all fonts
+        "ﬁ":r"fi",          # ligature
         "•":r"$\bullet$",
         "\u00A0":r"~",      # non-breaking space
         "\u2029":r"\par ",  # paragraph break
