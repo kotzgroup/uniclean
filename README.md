@@ -22,6 +22,10 @@ Then add a new entry to the mapping tables here, to help others in future!
 If no files are listed, the stdin is transformed and printed to stdout.
 Otherwise, each file is transformed and written back to the same file; if no changes were needed, the file is not touched.
 
+## TODO
+
+* needs an ‘encoding’ switch, to allow user to pick an encoding other than utf-8; see the [list](https://docs.python.org/3/library/codecs.html#standard-encodings) of encodings supported by Python.
+
 ## References:
  * [https://docs.python.org/3/howto/unicode.html]()
 
