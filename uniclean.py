@@ -181,8 +181,9 @@ def countUnmapped(sText, source, warnFile=None):
 def main():
     # parse command-line arguments
     parser = argparse.ArgumentParser(description='''
-        Translate Unicode within files, to ASCII, XML, HTML, or LaTeX.
-        Each file is processed and overwritten with any changes needed.
+        Translate Unicode within files, to ASCII, XML, HTML, or LaTeX;
+        ASCII is the default.
+        Each file is processed and OVERWRITTEN with any changes needed.
         If no files are listed, stdin is processed to stdout.''')
     formatGroup = parser.add_mutually_exclusive_group()
     formatGroup.add_argument('--ascii', action='store_const', \
