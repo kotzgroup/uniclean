@@ -21,8 +21,10 @@
 #
 # Exit 0 if success, non-zero if any Unicode could not be translated.
 #
-# References:
+# References for characters:
 #  https://www.compart.com/en/unicode/
+#  http://ctan.math.washington.edu/tex-archive/info/symbols/comprehensive/symbols-letter.pdf
+# References for Python:
 #  https://docs.python.org/2/library/argparse.html#module-argparse
 #  https://docs.python.org/3/howto/unicode.html
 #  https://docs.python.org/3/library/stdtypes.html#str.maketrans
@@ -63,6 +65,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "ş":"s",
         "ž":"z",
         "•":"*",
+        "ß":"Beta",    # LATIN SMALL LETTER SHARP S
         "ﬁ":"fi",      # ligature
         "\u00A0":" ",  # non-breaking space
         "\u2029":"\n", # paragraph break
@@ -117,6 +120,7 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "ñ":r"{\~{n}}",
         "ş":r"{\c{s}}",
         "ž":r"{\v{z}}",     # might not work in all fonts
+        "ß":"{$\textbeta$}",# LATIN SMALL LETTER SHARP S
         "ﬁ":r"fi",          # ligature
         "•":r"$\bullet$",
         "\u00A0":r"~",      # non-breaking space
