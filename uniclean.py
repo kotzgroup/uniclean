@@ -53,6 +53,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         '“':'"', '”':'"',
         "—":"-", "–":"-", "−":"-", "‐":"-",
         "≤":"<=", "≥":">=",
+        "±":"+/-",     # PLUS-MINUS SIGN
         "©":"(c)",
         "…":"...",
         "á":"a", "à":"a", "ä":"a",
@@ -109,6 +110,7 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         '“':r"``",  '”':r"''",
         "—":r"---", "–":r"--", "−":r"--", "‐":r"-",
         "≤":r"$\leq$", "≥":r"$\geq$",
+        "±":"$\pm$",        # PLUS-MINUS SIGN
         "©":r"{\textcopyright}",
         "…":r"{\ldots}",
         "á":r"{\'{a}}", "à":r"{\`{a}}", "ä":r'{\"{a}}',
