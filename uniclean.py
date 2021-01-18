@@ -66,7 +66,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "ş":"s",
         "ž":"z",
         "•":"*",
-        " ":" ",       # THIN SPACE
+        "\u2009":" ",  # THIN SPACE
         "ß":"Beta",    # LATIN SMALL LETTER SHARP S
         "ﬁ":"fi",      # ligature
         "\u00A0":" ",  # non-breaking space
@@ -110,8 +110,8 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "‘":r"`",   "’":r"'",
         '“':r"``",  '”':r"''",
         "—":r"---", "–":r"--", "−":r"--", "‐":r"-",
-        "≤":r"$\leq$", "≥":r"$\geq$",
-        "±":"$\pm$",        # PLUS-MINUS SIGN
+        "≤":r"{$\leq$}", "≥":r"{$\geq$}",
+        "±":r"{$\pm$}",        # PLUS-MINUS SIGN
         "©":r"{\textcopyright}",
         "…":r"{\ldots}",
         "á":r"{\'{a}}", "à":r"{\`{a}}", "ä":r'{\"{a}}',
@@ -123,10 +123,10 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "ñ":r"{\~{n}}",
         "ş":r"{\c{s}}",
         "ž":r"{\v{z}}",     # might not work in all fonts
-        "ß":"{$\textbeta$}",# LATIN SMALL LETTER SHARP S
+        "ß":r"{$\textbeta$}",# LATIN SMALL LETTER SHARP S
         "ﬁ":r"fi",          # ligature
-        "•":r"$\bullet$",
-        " ":" ",            # THIN SPACE 
+        "•":r"{$\bullet$}",
+        "\u2009":" ",       # THIN SPACE
         "\u00A0":r"~",      # non-breaking space
         "\u2029":r"\par ",  # paragraph break
         }
