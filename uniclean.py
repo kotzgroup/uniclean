@@ -66,6 +66,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "ş":"s",
         "ž":"z",
         "•":"*",
+        " ":" ",       # THIN SPACE
         "ß":"Beta",    # LATIN SMALL LETTER SHARP S
         "ﬁ":"fi",      # ligature
         "\u00A0":" ",  # non-breaking space
@@ -125,6 +126,7 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "ß":"{$\textbeta$}",# LATIN SMALL LETTER SHARP S
         "ﬁ":r"fi",          # ligature
         "•":r"$\bullet$",
+        " ":" ",            # THIN SPACE 
         "\u00A0":r"~",      # non-breaking space
         "\u2029":r"\par ",  # paragraph break
         }
