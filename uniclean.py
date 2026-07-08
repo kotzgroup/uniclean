@@ -67,6 +67,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "ž":"z",
         "•":"*",
         "μ":"u",
+        "×":"x",       # MULTIPLICATION SIGN
         "\u2009":" ",  # THIN SPACE
         "ß":"Beta",    # LATIN SMALL LETTER SHARP S
         "ﬁ":"fi",      # ligature
@@ -114,6 +115,7 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "≤":r"{$\leq$}", "≥":r"{$\geq$}",
         "±":r"{$\pm$}",        # PLUS-MINUS SIGN
         "μ":r"{$\mu$}",
+        "×":r"{$\times$}",   # MULTIPLICATION SIGN
         "©":r"{\textcopyright}",
         "…":r"{\ldots}",
         "á":r"{\'{a}}", "à":r"{\`{a}}", "ä":r'{\"{a}}', "ā":r"{\={a}}",
