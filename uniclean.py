@@ -56,7 +56,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "±":"+/-",     # PLUS-MINUS SIGN
         "©":"(c)",
         "…":"...",
-        "á":"a", "à":"a", "ä":"a",
+        "á":"a", "à":"a", "ä":"a", "ā":"a",
         "é":"e", "è":"e",
         "í":"i",
         "ö":"o", "ó":"o",
@@ -67,6 +67,7 @@ def mapASCII(mapp={}): # return (mapTable, mapErrors)
         "ž":"z",
         "•":"*",
         "μ":"u",
+        "×":"x",       # MULTIPLICATION SIGN
         "\u2009":" ",  # THIN SPACE
         "ß":"Beta",    # LATIN SMALL LETTER SHARP S
         "ﬁ":"fi",      # ligature
@@ -114,9 +115,10 @@ def mapLaTeX(mapp={}): # return (mapTable, mapErrors)
         "≤":r"{$\leq$}", "≥":r"{$\geq$}",
         "±":r"{$\pm$}",        # PLUS-MINUS SIGN
         "μ":r"{$\mu$}",
+        "×":r"{$\times$}",   # MULTIPLICATION SIGN
         "©":r"{\textcopyright}",
         "…":r"{\ldots}",
-        "á":r"{\'{a}}", "à":r"{\`{a}}", "ä":r'{\"{a}}',
+        "á":r"{\'{a}}", "à":r"{\`{a}}", "ä":r'{\"{a}}', "ā":r"{\={a}}",
         "é":r"{\'{e}}", "è":r"{\`{e}}",
         "í":r"{\'{\i}}",
         "ö":r'{\"{o}}', "ó":r'{\'{o}}',
